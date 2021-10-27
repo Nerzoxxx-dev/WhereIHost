@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AuthController extends AbstractController
 {
@@ -46,5 +47,10 @@ class AuthController extends AbstractController
         $entityManager->flush();
 
         return new Response("Account created!");
+    }
+
+    /** @Route("/auth/register", name="viewRegister", methods="GET") */
+    public function viewRegister(): Response {
+        return $this->render("auth/index.html.twig");
     }
 }
