@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'auth.register.title'|trans({'%title%': appname|capitalize}, 'auth') }}{% endblock %}
+
+{% block body %}
+{% if errors is defined %}
+    {% if errors %}
+        {% if errors is iterable %}
+            {% for error in errors %}
+                <li> {{ error }} </li>   
+            {% endfor %}
+        {% else %}
+            <li> {{ errors}} </li>
+        {% endif %}
+    {% endif %}
+{% endif %}
+
+<form method="POST" action="/auth/register">
+    <input type="text" id="username" name="username" placeholder="{{ 'username'|trans({}, 'base')|capitalize }}"/>
+    <input type="email" id="email" name="email" placeholder="{{ 'email'|trans({}, 'base')|capitalize }}"/>
+    <input type="text" id="phone_number" name="phone_number" placeholder="{{ 'phone_number'|trans({}, 'base')|capitalize }}"/>
+    <input type="text" id="first_name" name="first_name" placeholder="{{ 'first_name'|trans({}, 'base')|capitalize }}"/>
+    <input type="text" id="last_name" name="last_name" placeholder="{{ 'last_name'|trans({}, 'base')|capitalize }}"/>
+    <input type="password" id="password" name="password" placeholder="{{ 'password'|trans({}, 'base')|capitalize }}"/>
+    <input type="submit" id="submit" value="{{ 'submit'|trans({}, 'base')|capitalize }}"/>
+</form>
+{% endblock %}
