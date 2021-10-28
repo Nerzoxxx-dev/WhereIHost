@@ -15,6 +15,11 @@
     {% endif %}
 {% endif %}
 
+{% if success is defined %}
+    <li> Succès: {{ success }} </li>
+{% endif %}
+
+
 <form method="POST" action="/auth/register">
     <input type="text" id="username" name="username" placeholder="{{ 'username'|trans({}, 'base')|capitalize }}"/>
     <input type="email" id="email" name="email" placeholder="{{ 'email'|trans({}, 'base')|capitalize }}"/>

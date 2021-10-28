@@ -3,10 +3,12 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @UniqueEntity(fields={"email", "username", "phone_number"}, message="auth.register.account_already_exists")
  */
 class User
 {
@@ -55,7 +57,7 @@ class User
     /**
      * @ORM\Column(type="datetime_immutable", nullable=true)
      */
-    private $modified_at;
+    private $verified_at;
 
     /**
      * @ORM\Column(type="string", length=5)
@@ -152,14 +154,14 @@ class User
         return $this;
     }
 
-    public function getModifiedAt(): ?\DateTimeImmutable
+    public function getVerifiedAt(): ?\DateTimeImmutable
     {
-        return $this->modified_at;
+        return $this->verified_at;
     }
 
-    public function setModifiedAt(\DateTimeImmutable $modified_at): self
+    public function setVerifiedAt(\DateTimeImmutable $verified_at): self
     {
-        $this->modified_at = $modified_at;
+        $this->verified_at = $verified_at;
 
         return $this;
     }

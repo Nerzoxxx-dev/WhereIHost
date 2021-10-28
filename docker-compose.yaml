@@ -1,0 +1,7 @@
+version: '2.2'
+services:
+    maildev:
+        image: djfarrelly/maildev
+        container_name: inlinesd_maildev
+        ports:
+            - 8181:80

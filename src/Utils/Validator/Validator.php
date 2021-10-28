@@ -14,7 +14,7 @@ class Validator {
 
     public function string(TranslatorInterface $trans, ...$args): Validator {
         foreach($args as $k => $arg){
-            if(!is_string($arg[0])) $this->errors[] = $trans->trans("validator.not.string", ["%field%" => $trans->trans($arg[1], [], 'base')], 'validator');
+            if(!is_string($arg[0]) || ctype_digit($arg[0])) $this->errors[] = $trans->trans("validator.not.string", ["%field%" => $trans->trans($arg[1], [], 'base')], 'validator');
         }
         return $this;
     }
@@ -42,7 +42,12 @@ class Validator {
     }
 
     public function phoneNumber(TranslatorInterface $trans, $arg, string $fieldname): Validator {
-        if(!preg_match("#[0][6][- \.?]?([0-9][0-9][- \.?]?){4}$#", $arg)) $this->errors[] = $trans->trans("validator.not.phone_number", ["%field%" => $trans->trans($fieldname, [], 'base')], 'validator');
+        if(!preg_match("#[0][1-9][- \.?]?([0-9][0-9][- \.?]?){4}$#", $arg)) $this->errors[] = $trans->trans("validator.not.phone_number", ["%field%" => $trans->trans($fieldname, [], 'base')], 'validator');
+        return $this;
+    }
+
+    public function password(TranslatorInterface $trans, $arg, string $fieldname): Validator {
+        if(!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,12}$/', $arg)) $this->errors[] = $trans->trans("validator.not.password", ["%field%" => $trans->trans($fieldname, [], 'base')], 'validator');
         return $this;
     }
 }
