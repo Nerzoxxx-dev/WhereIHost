@@ -64,6 +64,11 @@ class User
      */
     private $locale;
 
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $token;
+
 
     public function getId(): ?int
     {
@@ -174,6 +179,18 @@ class User
     public function setLocale(string $locale): self
     {
         $this->locale = $locale;
+
+        return $this;
+    }
+
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    public function setToken(?string $token): self
+    {
+        $this->token = $token;
 
         return $this;
     }

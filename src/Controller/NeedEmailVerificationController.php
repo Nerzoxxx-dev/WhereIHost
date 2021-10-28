@@ -15,6 +15,7 @@ class NeedEmailVerificationController extends AbstractController {
     }
 
     public function emailVerification(){
+        if(!$this->requestStack->getSession()->has('userLoginId')) return $this->redirectToRoute('viewRegister');
         $userid = $this->requestStack->getSession()->get('userLoginId');
         
         $user = $this->getDoctrine()

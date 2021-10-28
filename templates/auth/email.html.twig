@@ -3,5 +3,22 @@
 {% block title %}{{ 'auth.email.title'|trans({'%title%': appname|capitalize}, 'auth') }}{% endblock %}
 
 {% block body %}
-    <p>Refresh the page once you have verified your account by checking emails </p>
+{% if not message is defined and not error is defined  %}
+    {% if noverified is defined %}
+        {% if noverified = true %}
+            <p>Refresh the page once you have verified your account by checking emails </p>
+        {% endif %}
+    {% endif %}
+{% else %}
+    {% if message is defined and message%}
+        <li> {{ message }}</li>
+    {% endif %}
+    {% if error is defined and error %}
+        <li> {{ error }} </li>
+    {% endif %}
+{% endif %}
+
+{% if button is defined %}
+    <a href="{{ button[1] }}"> {{ button[0] }} </a>
+{% endif %}
 {% endblock %}

@@ -7,5 +7,6 @@ return [
     "username" => "Nom d'utilisateur",
     "first_name" => "Prénom",
     "last_name" => "Nom de famille",
-    "submit" => "Envoyer"
+    "submit" => "Envoyer",
+    "base.go.home" => "Retourner au menu"
 ];
