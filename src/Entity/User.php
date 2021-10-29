@@ -69,6 +69,16 @@ class User
      */
     private $token;
 
+    /**
+     * @ORM\Column(type="string", length=40, nullable=true)
+     */
+    private $password_token;
+
+    /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     */
+    private $password_reset_at;
+
 
     public function getId(): ?int
     {
@@ -191,6 +201,30 @@ class User
     public function setToken(?string $token): self
     {
         $this->token = $token;
+
+        return $this;
+    }
+
+    public function getPasswordToken(): ?string
+    {
+        return $this->password_token;
+    }
+
+    public function setPasswordToken(?string $password_token): self
+    {
+        $this->password_token = $password_token;
+
+        return $this;
+    }
+
+    public function getPasswordResetAt(): ?\DateTimeImmutable
+    {
+        return $this->password_reset_at;
+    }
+
+    public function setPasswordResetAt(?\DateTimeImmutable $password_reset_at): self
+    {
+        $this->password_reset_at = $password_reset_at;
 
         return $this;
     }

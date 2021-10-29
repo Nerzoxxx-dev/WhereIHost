@@ -5,10 +5,11 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Utils\AppUtils;
 use App\Utils\StringUtils;
+use App\Utils\UserUtils;
 use App\Utils\Validator\Validator;
 use DateTimeImmutable;
+use PHPUnit\Framework\MockObject\Stub\ReturnStub;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -41,6 +42,7 @@ class AuthController extends NeedEmailVerificationController
         $errors = $validator
                 ->string($trans, [$request->request->get('username'), "username"], [$request->request->get('first_name'), "first_name"], [$request->request->get('last_name'), "last_name"], [$request->request->get('email'), "email"], [$request->request->get('password'), "password"])
                 ->phoneNumber($trans, $request->request->get('phone_number'), 'phone_number')
+                ->email($request->request->get('email'), $trans)
                 ->password($trans, $request->request->get('password'), "password")
                 ->validate();
         
@@ -74,11 +76,11 @@ class AuthController extends NeedEmailVerificationController
         $appurl = AppUtils::getUrl();
 
         $email = (new Email())
-                                ->from('no-reply@clientarea.fr')
-                                ->to($user->getEmail())
-                                ->subject($trans->trans('auth.email.title_verify_email', [], 'auth'))
-                                ->text($trans->trans('auth.email.text', [], 'auth'))
-                                ->html("<p> {$trans->trans('auth.email.p.verify', ['%username%' => $user->getUsername()], 'auth')} </p> <br/> <a href='$appurl/auth/email?token=$token'> {$trans->trans('auth.email.a.verify', [], 'auth')} </a>");
+                ->from('no-reply@clientarea.fr')
+                ->to($user->getEmail())
+                ->subject($trans->trans('auth.email.title_verify_email', [], 'auth'))
+                ->text($trans->trans('auth.email.text', [], 'auth'))
+                ->html("<p> {$trans->trans('auth.email.p.verify', ['%username%' => $user->getUsername()], 'auth')} </p> <br/> <a href='$appurl/auth/email?token=$token'> {$trans->trans('auth.email.a.verify', [], 'auth')} </a>");
         
         $mailer->send($email);
 
@@ -89,6 +91,7 @@ class AuthController extends NeedEmailVerificationController
 
     /** @Route("/auth/register", name="viewRegister", methods="GET") */
     public function viewRegister(): Response {
+        if($this->requestStack->getSession()->has('userLoginId') && UserUtils::userExists($this->requestStack->getSession()->get('userLoginId'), $this->getDoctrine())) return $this->redirectToRoute('home');
         return $this->render("auth/register.html.twig", ["appname" => AppUtils::getAppName()]);
     }
 
@@ -108,5 +111,77 @@ class AuthController extends NeedEmailVerificationController
 
             return $this->render('auth/email.html.twig', ['appname' => AppUtils::getAppName(), 'message' => $trans->trans('auth.email.verfication_success', [], 'auth'), 'button' => [$trans->trans('base.go.home', [], 'base'), "/"]]);
         }
+    }
+
+    /** @Route("/auth/password", methods="GET", name="viewPassword") */
+    public function viewPassword(Request $request): Response{
+        return $this->render('auth/password.html.twig', ['appname' => AppUtils::getAppName()]);
+    }
+
+    /** @Route("/auth/password", methods="POST", name="postPassword") */
+    public function postPassword(Request $request, TranslatorInterface $trans, MailerInterface $mailer): Response{
+        $errors = (new Validator())
+                  ->email($request->request->get('email'), $trans)
+                  ->validate();
+        
+        if(!empty($errors)) return $this->render('auth/password.html.twig', ['appname' => AppUtils::getAppName(), 'errors' => $errors[0]]);
+
+        if(!UserUtils::userExistsByEmail($request->request->get('email'), $this->getDoctrine(), $trans)) return $this->render('auth/password.html.twig', ['appname' => AppUtils::getAppName(), 'errors' => $trans->trans('auth.password.unknow_user', ['%email%' => $request->request->get('email')], 'auth')]);
+
+        $user = UserUtils::getByEmail($request->request->get('email'), $this->getDoctrine(), $trans);
+        $token = StringUtils::checkUserPasswordToken(StringUtils::random(40), $this->getDoctrine());
+        $appurl = AppUtils::getUrl();
+
+        $user->setPasswordToken($token);
+        $user->setPasswordResetAt(new DateTimeImmutable());
+
+        $this->getDoctrine()->getManager()->persist($user);
+        $this->getDoctrine()->getManager()->flush();
+
+        $email = (new Email())
+                ->from('no-reply@clientarea.fr')
+                ->to($user->getEmail())
+                ->subject($trans->trans('auth.password.email.title_email', [], 'auth'))
+                ->text($trans->trans('auth.password.email.text', [], 'auth'))
+                ->html("<p> {$trans->trans('auth.password.email.p.verify', ['%username%' => $user->getUsername()], 'auth')} </p> <br/> <a href='$appurl/auth/password/change?token=$token'> {$trans->trans('auth.password.email.a.verify', [], 'auth')} </a>");
+
+        $mailer->send($email);
+
+        return $this->render('auth/password.html.twig', ['appname' => AppUtils::getAppName(), 'success' => $trans->trans('auth.password.email_send', [], 'auth')]);
+    }
+    
+    /** @Route("/auth/password/change", methods="GET", name="passwordChange") */
+    public function passwordChange(Request $request, TranslatorInterface $trans): Response {
+        if(!$request->query->has('token') || !UserUtils::userExistsByPasswordToken($request->query->get('token'), $this->getDoctrine())) return $this->render('auth/password.html.twig', ['appname' => AppUtils::getAppName(), 'errors' => $trans->trans('auth.password.invalid_token', [], 'auth')]);
+
+        $user = UserUtils::getByPasswordToken($request->query->get('token'), $this->getDoctrine());
+        if($user->getPasswordResetAt()->diff(new DateTimeImmutable())->d >= 1) return $this->render('auth/password.html.twig', ['appname' => AppUtils::getAppName(), 'errors' => $trans->trans('auth.password.link_expire', [], 'auth')]);
+        setcookie('passwordtoken', base64_encode($request->query->get('token')));
+        return $this->render('auth/passwordchange.html.twig', ['appname' => AppUtils::getAppName()]);
+    }
+
+    /** @Route("/auth/password/change", methods="POST", name="postPasswordChange") */
+    public function postPasswordChange(Request $request, TranslatorInterface $trans): Response {
+        if(!isset($_COOKIE['passwordtoken'])) return $this->render('auth/passwordchange.html.twig', ['appname' => AppUtils::getAppName(), 'errors' => $trans->trans('auth.password.error', [], 'auth')]);
+
+        $errors = (new Validator())->password($trans, $request->request->get('password'), $trans->trans('password', [], 'base'))->validate();
+        if(!empty($errors)) return $this->render('auth/passwordchange.html.twig', ['appname' => AppUtils::getAppName(), 'errors' => $errors[0]]);
+
+        if($request->request->get('password') !== $request->request->get('password_confirm')) return $this->render('auth/passwordchange.html.twig', ['appname' => AppUtils::getAppName(), 'errors' => $trans->trans('auth.register.password_not_match', [], 'auth')]);
+
+        $user = UserUtils::getByPasswordToken(base64_decode($_COOKIE['passwordtoken']), $this->getDoctrine());
+        if(!$user) return $this->render('auth/passwordchange.html.twig', ['appname' => AppUtils::getAppName(), 'errors' => $trans->trans('auth.password.error', [], 'auth')]);
+
+        $user->setPasswordResetAt(null);
+        $user->setPasswordToken(null);
+        $user->setPasswordHash(password_hash($request->request->get('password'), PASSWORD_BCRYPT));
+
+        $entityManager = $this->getDoctrine()->getManager();
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        setCookie('passwordtoken', null);
+        return $this->render('auth/passwordchange.html.twig', ['appname' => AppUtils::getAppName(), 'success' => $trans->trans('auth.password.changed', [], 'auth')]);
     }
 }

@@ -50,4 +50,9 @@ class Validator {
         if(!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,12}$/', $arg)) $this->errors[] = $trans->trans("validator.not.password", ["%field%" => $trans->trans($fieldname, [], 'base')], 'validator');
         return $this;
     }
+
+    public function email($email, TranslatorInterface $trans): Validator {
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL)) $this->errors[] = $trans->trans("validator.invalid_email", [], 'validator');
+        return $this;
+    }
 }

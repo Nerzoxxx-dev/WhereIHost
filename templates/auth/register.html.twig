@@ -92,11 +92,11 @@
                         <input class="input" type="password" name="password_confirm" id="confirm" value="">
                     </div>
                 </div>
-                <a href="#" class="links-auth"> Mot de Passe oublié ? </a>
-                <a href="/auth/login" class="links-auth"> Déjà un compte ? Se connecter ! </a>
-                <input type="submit" class="btn" value="S'inscrire">
+                <a href="/auth/password" class="links-auth"> {{ 'reset_password'|trans({}, 'base')|capitalize }} </a>
+                <a href="/auth/login" class="links-auth"> {{ 'already_an_account'|trans({}, 'base')|capitalize }} </a>
+                <input type="submit" class="btn" value="{{ 'register'|trans({}, 'base')|capitalize }}">
             </form>
         </div>
     </div>
-    <script type="text/javascript" src="{{ asset('js/auth/register.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/auth/auth.js') }}"></script>
 {% endblock %}

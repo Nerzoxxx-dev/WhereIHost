@@ -25,4 +25,11 @@ class StringUtils {
         return $string;
     }
 
+    public static function checkUserPasswordToken(string $string, ManagerRegistry $doctrine){
+        $user = $doctrine->getRepository(User::class)->findBy(['password_token' => $string]);
+
+        if($user) return self::checkUserToken(self::random(strlen($string)), $doctrine);
+        return $string;
+    }
+
 }

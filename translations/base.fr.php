@@ -10,5 +10,8 @@ return [
     "last_name" => "Nom de famille",
     "submit" => "Envoyer",
     "base.go.home" => "Retourner au menu",
-    "welcome" => "Bienvenue"
+    "welcome" => "Bienvenue",
+    "register" => "S'inscrire",
+    "reset_password" => "Réinitialiser le mot de passe",
+    "already_an_account" => "Vous avez déjà un compte ? Se connecter!"
 ];
