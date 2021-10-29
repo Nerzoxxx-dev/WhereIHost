@@ -1,32 +1,102 @@
-{% extends 'base.html.twig' %}
+{% extends 'auth/auth.html.twig' %}
 
 {% block title %}{{ 'auth.register.title'|trans({'%title%': appname|capitalize}, 'auth') }}{% endblock %}
 
 {% block body %}
+<script type="text/javascript" src="{{ asset('js/alert.js') }}" />
+<script> </script>
 {% if errors is defined %}
     {% if errors %}
         {% if errors is iterable %}
-            {% for error in errors %}
-                <li> {{ error }} </li>   
-            {% endfor %}
+            <script> cuteToast("error", "{{ errors[0] }}") </script>
         {% else %}
-            <li> {{ errors}} </li>
+            <script> cuteToast("error", "{{ errors }}") </script>
         {% endif %}
     {% endif %}
 {% endif %}
 
 {% if success is defined %}
-    <li> Succès: {{ success }} </li>
+    <script> cuteToast("success", "{{ success }}") </script>
 {% endif %}
 
 
-<form method="POST" action="/auth/register">
-    <input type="text" id="username" name="username" placeholder="{{ 'username'|trans({}, 'base')|capitalize }}"/>
-    <input type="email" id="email" name="email" placeholder="{{ 'email'|trans({}, 'base')|capitalize }}"/>
-    <input type="text" id="phone_number" name="phone_number" placeholder="{{ 'phone_number'|trans({}, 'base')|capitalize }}"/>
-    <input type="text" id="first_name" name="first_name" placeholder="{{ 'first_name'|trans({}, 'base')|capitalize }}"/>
-    <input type="text" id="last_name" name="last_name" placeholder="{{ 'last_name'|trans({}, 'base')|capitalize }}"/>
-    <input type="password" id="password" name="password" placeholder="{{ 'password'|trans({}, 'base')|capitalize }}"/>
-    <input type="submit" id="submit" value="{{ 'submit'|trans({}, 'base')|capitalize }}"/>
-</form>
+    <img class="wave" src="{{ asset('img/wave.png') }}" alt="waves">
+    <div class="container">
+        <div class="img">
+            <img src="{{ asset('img/bg.svg') }}" alt="Background">
+        </div>
+        <div class="login-container">
+            <form class="login-form" method="POST">
+                <img class="avatar" src="{{ asset('img/avatar.svg') }}" alt="Avatar">
+                <h2>{{ 'welcome'|trans({}, 'base')|capitalize }} !</h2>
+                <div class="input-div one">
+                    <div class="i">
+                        <i class="fas fa-at"></i>
+                    </div>
+                    <div>
+                        <h5>{{ 'email'|trans({}, 'base')|capitalize }}</h5>
+                        <input class="input" type="email" name="email" id="email" value="">
+                    </div>
+                </div>
+                <div class="input-div one">
+                    <div class="i">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <h5>{{ 'username'|trans({}, 'base') }}</h5>
+                        <input class="input" type="text" name="username" id="username" value="">
+                    </div>
+                </div>
+                <div class="input-div one">
+                    <div class="i">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <h5>{{ 'first_name'|trans({}, 'base')|capitalize }}</h5>
+                        <input class="input" type="text" name="first_name" id="first_name" value="">
+                    </div>
+                </div>
+                <div class="input-div one">
+                    <div class="i">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <h5>{{ 'last_name'|trans({}, 'base')|capitalize }}</h5>
+                        <input class="input" type="text" name="last_name" id="last_name" value="">
+                    </div>
+                </div>
+                <div class="input-div one">
+                    <div class="i">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div>
+                        <h5>{{ 'phone_number'|trans({}, 'base')|capitalize }}</h5>
+                        <input class="input" type="text" name="phone_number" id="phone_number" value="">
+                    </div>
+                </div>
+                <div class="input-div two">
+                    <div class="i">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div>
+                        <h5>{{ 'password'|trans({}, 'base')|capitalize }}</h5>
+                        <input class="input" type="password" name="password" id="pass" value="">
+                    </div>
+                </div>
+                <div class="input-div two">
+                    <div class="i">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div>
+                        <h5>{{ 'password_confirm'|trans({}, 'base')|capitalize }}</h5>
+                        <input class="input" type="password" name="password_confirm" id="confirm" value="">
+                    </div>
+                </div>
+                <a href="#" class="links-auth"> Mot de Passe oublié ? </a>
+                <a href="/auth/login" class="links-auth"> Déjà un compte ? Se connecter ! </a>
+                <input type="submit" class="btn" value="S'inscrire">
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript" src="{{ asset('js/auth/register.js') }}"></script>
 {% endblock %}

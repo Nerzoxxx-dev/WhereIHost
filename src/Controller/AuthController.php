@@ -32,7 +32,7 @@ class AuthController extends NeedEmailVerificationController
      * @return Response
      */
     public function createUser(Request $request, TranslatorInterface $trans, ValidatorInterface $symfonyValidator, MailerInterface $mailer): Response {
-        $requirements = ["username", "first_name", "last_name", "password", "phone_number", "email"];
+        $requirements = ["email", "username", "first_name", "last_name", "phone_number", "password", "password_confirm"];
         foreach($requirements as $requirement){
             if(!$request->request->has($requirement) || empty($request->request->get($requirement))) return $this->render('auth/register.html.twig', ["errors" => $trans->trans('auth.register.errors.missing', ['%field%' => $trans->trans($requirement, [], 'base')], 'auth'), "appname" => AppUtils::getAppName()]);
         }
@@ -45,6 +45,8 @@ class AuthController extends NeedEmailVerificationController
                 ->validate();
         
         if(!empty($errors)) return $this->render('auth/register.html.twig', ["errors" => $errors, "appname" => AppUtils::getAppName()]);
+
+        if($request->request->get('password') !== $request->request->get('password_confirm')) return $this->render('auth/register.html.twig', ["errors" => $trans->trans('auth.register.password_not_match', [], 'auth'), "appname" => AppUtils::getAppName()]);
 
         $password_hash = password_hash($request->request->get('password'), PASSWORD_BCRYPT);
         $doctrine = $this->getDoctrine();
@@ -98,7 +100,7 @@ class AuthController extends NeedEmailVerificationController
             $token = $request->query->get('token');
             $doctrine = $this->getDoctrine();
             $user = $doctrine->getRepository(User::class)->findOneBy(['token' => $token]);
-            if(!$user) return $this->render('auth/email.html.twig', ['appname' => AppUtils::getAppName(), 'error' => $trans->trans('auth.email.invalid_token')]);
+            if(!$user) return $this->render('auth/email.html.twig', ['appname' => AppUtils::getAppName(), 'error' => $trans->trans('auth.email.invalid_token', [], 'auth')]);
             $user->setToken(null);
             $user->setVerifiedAt(new DateTimeImmutable());
             $doctrine->getManager()->persist($user);

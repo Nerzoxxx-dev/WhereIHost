@@ -1,20 +1,22 @@
-{% extends 'base.html.twig' %}
+{% extends 'auth/auth.html.twig' %}
 
 {% block title %}{{ 'auth.email.title'|trans({'%title%': appname|capitalize}, 'auth') }}{% endblock %}
 
 {% block body %}
+<script type="text/javascript" src="{{ asset('js/alert.js') }}" />
+<script></script>
 {% if not message is defined and not error is defined  %}
     {% if noverified is defined %}
-        {% if noverified = true %}
-            <p>Refresh the page once you have verified your account by checking emails </p>
+        {% if noverified == true %}
+            <p>{{ 'auth.email.please_verify'|trans({}, 'auth') }}</p>
         {% endif %}
     {% endif %}
 {% else %}
     {% if message is defined and message%}
-        <li> {{ message }}</li>
+        <script> cuteToast('success', "{{ message}}") </script>
     {% endif %}
     {% if error is defined and error %}
-        <li> {{ error }} </li>
+        <script> cuteToast('error', "{{ error }}") </script>
     {% endif %}
 {% endif %}
 
