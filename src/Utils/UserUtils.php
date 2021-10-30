@@ -28,6 +28,11 @@ class UserUtils {
         return true;
     }
 
+    public static function getById($id, ManagerRegistry $doctrine) :?User {
+        $user = $doctrine->getRepository(User::class)->find($id);
+        return $user;
+    }
+
     public static function getByEmail($email, ManagerRegistry $doctrine, TranslatorInterface $trans): ?User {
         $errors = (new Validator())->email($email, $trans)->validate();
 
@@ -47,5 +52,17 @@ class UserUtils {
         $user = $doctrine->getRepository(User::class)->findOneBy(['password_token' => $token]);
 
         return $user;
+    }
+
+    public static function getByUserName($username, ManagerRegistry $doctrine): ?User {
+        return $user = $doctrine->getRepository(User::class)->findOneBy(['username' => $username]);
+    }
+
+    public static function isVerified($id, ManagerRegistry $doctrine): bool{
+        $user = self::getById($id, $doctrine);
+
+        if(!$user) return false;
+        if($user->getVerifiedAt() === null) return false;
+        return true;
     }
 }

@@ -16,7 +16,9 @@
 {% endif %}
 
 {% if success is defined %}
-    <script> cuteToast("success", "{{ success }}") </script>
+    <script> cuteToast("success", "{{ success }}")
+             setTimeout(() => {window.top.location = '/auth/email/verify'}, 5000)
+    </script>
 {% endif %}
 
 

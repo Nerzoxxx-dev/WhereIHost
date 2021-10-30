@@ -11,7 +11,7 @@ return [
     'auth.email.p.verify' => "%username%, veuillez vérifier votre compte pour accéder à la totalité du site.",
     'auth.email.a.verify' => "Vérifier",
     'auth.email.title_verify_email' => "Veuillez vérifier votre compte",
-    'auth.email.verfication_success' => "Email vérifé!",
+    'auth.email.verfication_success' => "Email vérifé! Vous allez être redirigé.",
     'auth.email.invalid_token' => "Un mauvais jeton de vérification a été soumis. Vérifiez vos mails!",
     'auth.password.title' => "%title%: Réinitialiser le mot de passe",
     'auth.password.email.text' => "Vous avez demandé à changer votre mot de passe. Pour suivre cet action, veuillez utiliser le lien suivant qui est valide pour un jour. Lien: %link%  Si ce n'est pas vous, ingnorez ce mail.",
@@ -23,5 +23,10 @@ return [
     'auth.password.invalid_token' => "Un mauvais jeton a été promis. Revérifiez vos mails!",
     'auth.password.link_expire' => "Le lien a expiré",
     'auth.password.error' => "Une erreur s'est produite, veuillez reéssayer.",
-    'auth.password.changed' => "Le mot de passe a bien été modifié. Vous allez être redirigé."
+    'auth.password.changed' => "Le mot de passe a bien été modifié. Vous allez être redirigé.",
+    'auth.login.title' => "%title%: Se connecter",
+    'auth.login.not_exists_by_email' => "Aucun utilisateur n'existe avec cet email.",
+    'auth.login.invalid_password' => "Mot de passe incorrect",
+    'auth.login.connected' => "Vous êtes bien connecté. Redirection...",
+    'auth.email.please_verify' => "Veuillez vérifier vos email s'il vous plaît."
 ];

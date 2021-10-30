@@ -22,7 +22,7 @@ class NeedEmailVerificationController extends AbstractController {
                                     ->getRepository(User::class)
                                     ->find($userid);
 
-        if(!$user) return $this->redirectToRoute('postLogout');
+        if(!$user) return $this->redirectToRoute('logout');
         if(is_null($user->getVerifiedAt())) return $this->redirectToRoute('viewEmail');
         return true;
     }

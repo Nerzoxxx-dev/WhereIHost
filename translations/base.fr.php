@@ -13,5 +13,8 @@ return [
     "welcome" => "Bienvenue",
     "register" => "S'inscrire",
     "reset_password" => "Réinitialiser le mot de passe",
-    "already_an_account" => "Vous avez déjà un compte ? Se connecter!"
+    "already_an_account" => "Vous avez déjà un compte ? Se connecter!",
+    "login" => "Se connecter",
+    "not_an_account" => "Pas de compte ? S'inscrire!",
+    "redirect" => "Redirection"
 ];

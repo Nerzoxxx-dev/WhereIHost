@@ -8,7 +8,6 @@ use App\Utils\StringUtils;
 use App\Utils\UserUtils;
 use App\Utils\Validator\Validator;
 use DateTimeImmutable;
-use PHPUnit\Framework\MockObject\Stub\ReturnStub;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
@@ -22,9 +21,9 @@ class AuthController extends NeedEmailVerificationController
     /**
      * @Route("/auth", name="auth")
      */
-    public function index(): Response
+    public function viewAuth(): Response
     {
-        return $this->redirectToRoute('login');
+        return $this->redirectToRoute('viewLogin');
     }
 
     /**
@@ -86,6 +85,7 @@ class AuthController extends NeedEmailVerificationController
 
         $session = $this->requestStack->getSession();
         $session->set('userLoginId', $user->getId());
+        setCookie('lastUserConnected', $user->getEmail());
         return $this->render('auth/register.html.twig', ["appname" => AppUtils::getAppName(), "success" => $trans->trans("auth.register.account_created", [], "auth")]);
     }
 
@@ -109,7 +109,7 @@ class AuthController extends NeedEmailVerificationController
             $doctrine->getManager()->persist($user);
             $doctrine->getManager()->flush();
 
-            return $this->render('auth/email.html.twig', ['appname' => AppUtils::getAppName(), 'message' => $trans->trans('auth.email.verfication_success', [], 'auth'), 'button' => [$trans->trans('base.go.home', [], 'base'), "/"]]);
+            return $this->render('auth/email.html.twig', ['appname' => AppUtils::getAppName(), 'success' => $trans->trans('auth.email.verfication_success', [], 'auth')]);
         }
     }
 
@@ -182,6 +182,63 @@ class AuthController extends NeedEmailVerificationController
         $entityManager->flush();
 
         setCookie('passwordtoken', null);
+        
+        $session = $this->requestStack->getSession();
+        if($session->has('userLoginId')) $session->remove('userLoginId');
+
         return $this->render('auth/passwordchange.html.twig', ['appname' => AppUtils::getAppName(), 'success' => $trans->trans('auth.password.changed', [], 'auth')]);
+    }
+
+    /** @Route("/auth/logout", methods="GET", name="logout") */
+    public function logout(): Response {
+        $session = $this->requestStack->getSession();
+        if(!$session->has('userLoginId')) return $this->redirectToRoute('home');
+        $session->remove('userLoginId');
+        return $this->redirectToRoute('home');
+    }
+
+    /** @Route("/auth/login", methods="GET", name="viewLogin") */
+    public function viewLogin(): Response {
+        $lastEmail = "";
+        if(isset($_COOKIE['lastUserConnected'])) $lastEmail = $_COOKIE['lastUserConnected'];
+        if($this->requestStack->getSession()->has('userLoginId') && UserUtils::userExists($this->requestStack->getSession()->get('userLoginId'), $this->getDoctrine())) return $this->redirectToRoute('home');
+        return $this->render("auth/login.html.twig", ["appname" => AppUtils::getAppName(), "lastEmail" => $lastEmail]);
+    }
+
+    /** @Route("/auth/login", methods="POST", name="postLogin") */
+    public function postLogin(Request $request, TranslatorInterface $trans){
+        $lastEmail = "";
+        if(isset($_COOKIE['lastUserConnected'])) $lastEmail = $_COOKIE['lastUserConnected'];
+        $requirements = ["email", "password"];
+        foreach($requirements as $requirement){
+            if(!$request->request->has($requirement) || empty($request->request->get($requirement))) return $this->render('auth/login.html.twig', ["errors" => $trans->trans('auth.register.errors.missing', ['%field%' => $trans->trans($requirement, [], 'base')], 'auth'), "appname" => AppUtils::getAppName(), "lastEmail" => $lastEmail]);
+        }
+
+        $errors = (new Validator())
+                  ->email($request->request->get('email'), $trans)
+                  ->password($trans, $request->request->get('password'), "password")
+                  ->validate();
+        
+        if(!empty($errors)) return $this->render('auth/login.html.twig', ['appname' => AppUtils::getAppName(), 'errors' => $errors[0], 'lastEmail' => $lastEmail]);
+
+        if(!UserUtils::userExistsByEmail($request->request->get('email'), $this->getDoctrine(), $trans)) return $this->render('auth/login.html.twig', ['appname' => AppUtils::getAppName(), 'errors' => $trans->trans('auth.login.not_exists_by_email', [], 'auth'), 'lastEmail' => $lastEmail]);
+
+        $user = UserUtils::getByEmail($request->request->get('email'), $this->getDoctrine(), $trans);
+        $password_hash = $user->getPasswordHash();
+        if(!password_verify($request->request->get('password'), $password_hash)) return $this->render('auth/login.html.twig', ['appname' => AppUtils::getAppName(), 'errors' => $trans->trans('auth.login.invalid_password', [], 'auth'), 'lastEmail' => $lastEmail]);
+
+        ($session = $this->requestStack->getSession())->set('userLoginId', $user->getId());
+        setCookie('lastUserConnected', $user->getEmail());
+
+        if(!UserUtils::isVerified($user->getId(), $this->getDoctrine())) return $this->redirectToRoute('pleaseVerifyEmail');
+
+        return $this->render('auth/login.html.twig', ['appname' => AppUtils::getAppName(), 'success' => $trans->trans('auth.login.connected', [], 'auth')]);
+    }
+
+    /** @Route("/auth/email/verify", methods="GET", name="pleaseVerifyEmail") */
+    public function viewEmailVerifyDemand(): Response {
+        if(!$this->requestStack->getSession()->has('userLoginId') || !UserUtils::userExists($this->requestStack->getSession()->get('userLoginId'), $this->getDoctrine())) return $this->redirectToRoute('viewLogin');
+        if(UserUtils::isVerified($this->requestStack->getSession()->get('userLoginId'), $this->getDoctrine())) return $this->redirectToRoute('home');
+        return $this->render('auth/emaildemand.html.twig', ['appname' => AppUtils::getAppName()]);
     }
 }
