@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} {{ 'admin.login_page.title'|trans({}, 'admin') }} {% endblock %}</title>
+    <link rel="stylesheet" href="{{ asset('css/admin/login/styles.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/admin/alert.css') }}" />
+</head>
+<body>
+    {% block body %} {% endblock %}
+    {% if datas.session.has("message") %}
+    <script> customAlert.alert("{{ datas.session.get("message") }}") </script>
+    {{ datas.session.remove("message") }}
+  {% endif %}
+    <script type="text/javascript" src="{{ asset('js/alert.js') }}" />
+</body>
+</html>

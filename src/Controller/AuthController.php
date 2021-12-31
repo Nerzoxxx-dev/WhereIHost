@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Utils\AppUtils;
+use App\Utils\NotificationUtils;
 use App\Utils\StringUtils;
 use App\Utils\UserUtils;
 use App\Utils\Validator\Validator;
@@ -49,6 +50,8 @@ class AuthController extends NeedEmailVerificationController
 
         if($request->request->get('password') !== $request->request->get('password_confirm')) return $this->render('auth/register.html.twig', ["errors" => $trans->trans('auth.register.password_not_match', [], 'auth'), "appname" => AppUtils::getAppName()]);
 
+        if(UserUtils::accountExists($request->request, $this->getDoctrine(), $trans)) return $this->render('auth/register.html.twig', ['errors' => $trans->trans("auth.register.account_already_exists", [], 'auth'), 'appname' => AppUtils::getAppName()]);
+
         $password_hash = password_hash($request->request->get('password'), PASSWORD_BCRYPT);
         $doctrine = $this->getDoctrine();
         $entityManager = $doctrine->getManager();
@@ -65,9 +68,6 @@ class AuthController extends NeedEmailVerificationController
         $user->setPasswordHash($password_hash);
         $user->setCreatedAt(new DateTimeImmutable());
         $user->setToken($token);
-
-        $error = $symfonyValidator->validate($user);
-        if(count($error) > 0) return $this->render('auth/register.html.twig', ['errors' => $trans->trans($error->get(0)->getMessage(), [], 'auth'), 'appname' => AppUtils::getAppName()]);
 
         $entityManager->persist($user);
         $entityManager->flush();
@@ -86,6 +86,7 @@ class AuthController extends NeedEmailVerificationController
         $session = $this->requestStack->getSession();
         $session->set('userLoginId', $user->getId());
         setCookie('lastUserConnected', $user->getEmail());
+        NotificationUtils::create($trans->trans('notification.create_user', ['%username%' => $user->getUsername()], 'notification'), 'user', $this->getDoctrine());
         return $this->render('auth/register.html.twig', ["appname" => AppUtils::getAppName(), "success" => $trans->trans("auth.register.account_created", [], "auth")]);
     }
 
@@ -192,9 +193,9 @@ class AuthController extends NeedEmailVerificationController
     /** @Route("/auth/logout", methods="GET", name="logout") */
     public function logout(): Response {
         $session = $this->requestStack->getSession();
-        if(!$session->has('userLoginId')) return $this->redirectToRoute('home');
+        if(!$session->has('userLoginId')) return $this->redirectToRoute('viewLogin');
         $session->remove('userLoginId');
-        return $this->redirectToRoute('home');
+        return $this->redirectToRoute('viewLogin');
     }
 
     /** @Route("/auth/login", methods="GET", name="viewLogin") */

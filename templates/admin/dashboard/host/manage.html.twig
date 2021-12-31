@@ -1,0 +1,239 @@
+{% extends 'admin/dashboard/dashboard.html.twig' %}
+
+{% block title %} {{ 'dashboard'|trans({}, 'admin') }} {% endblock %}
+
+{% block body %}
+<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
+    <div class="sidenav-header">
+      <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+        <a class="navbar-brand m-0">
+        <span class="ms-1 font-weight-bold text-white">{{ appname|capitalize }}</span>
+      </a>
+    </div>
+    <hr class="horizontal light mt-0 mb-2">
+    <div class="collapse navbar-collapse  w-auto  max-height-vh-100" id="sidenav-collapse-main">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link text-white" href="/admin/dashboard">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">dashboard</i>
+            </div>
+            <span class="nav-link-text ms-1">{{ 'dashboard'|trans({}, 'admin') }}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="/admin/announcements">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fas fa-bullhorn"></i>
+            </div>
+            <span class="nav-link-text ms-1">{{ 'announcements'|trans({}, 'admin') }}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white active bg-gradient-primary" href="/admin/hosts">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fas fa-server"></i>
+            </div>
+            <span class="nav-link-text ms-1">{{ 'hosts'|trans({}, 'admin') }}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="/admin/opinions">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fas fa-star"></i>
+            </div>
+            <span class="nav-link-text ms-1">{{ 'opinions'|trans({}, 'admin') }}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="/admin/users">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fas fa-users"></i>
+            </div>
+            <span class="nav-link-text ms-1">{{ 'users'|trans({}, 'admin') }}</span>
+          </a>
+        </li>
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">{{ 'account_pages'|trans({}, 'base') }}</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white " href="/admin/profil">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">person</i>
+            </div>
+            <span class="nav-link-text ms-1">{{ 'profile'|trans({}, 'base') }}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </aside>
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" navbar-scroll="true">
+      <div class="container-fluid py-1 px-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+            <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">{{ 'pages'|trans({}, 'base') }}</a></li>
+            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">{{ 'dashboard'|trans({}, 'admin') }}</li>
+            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">{{ 'hosts'|trans({}, 'admin') }}</li>
+          </ol>
+          <h6 class="font-weight-bolder mb-0">{{ host.getName() }}</h6>
+        </nav>
+          <ul class="navbar-nav  justify-content-end">
+            <li class="nav-item d-flex align-items-center">
+              <a href="/admin/profile" class="nav-link text-body font-weight-bold px-0">
+                <i class="fa fa-user me-sm-1"></i>
+                <span class="d-sm-inline d-none">{{ 'profile'|trans({}, 'base') }}</span>
+              </a>
+            </li>
+            <li class="nav-item d-flex ps-3 align-items-center">
+              <a href="/admin/logout" class="nav-link text-body font-weight-bold px-0">
+                <i class="fa fa-sign-out-alt me-sm-1"></i>
+              </a>
+            </li>
+            <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+              <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+                <div class="sidenav-toggler-inner">
+                  <i class="sidenav-toggler-line"></i>
+                  <i class="sidenav-toggler-line"></i>
+                  <i class="sidenav-toggler-line"></i>
+                </div>
+              </a>
+            </li>
+            <li class="nav-item px-3 d-flex align-items-center">
+              <a href="javascript:;" class="nav-link text-body p-0">
+                <i class="fa fa-cog fixed-plugin-button-nav cursor-pointer"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+    <div class="row">
+      <div class="card col-sm-5 m-4 me-4 mt-2">
+        <div class="card-header">
+          <img src="{{ asset('img/hosts/' ~ host.getLogoFilename()) }}" height="300px" height="auto" />
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">{{ host.getName() }} {% if host.getIsVerified %} <i style="color: #548CFF;" class="fas fa-check fa-1,5x"></i> {% endif %}</h5>
+          <span id="host_description">{{ host.getDescription() | raw }}</span>
+          {% if host.getIsSuspend() %}
+            {% if suspend_by is defined %}
+              <p> {{ 'host_suspend_p'|trans({'%at%': host.getSuspendAt(), '%by%': suspend_by.getUsername()}, 'host') }} </p>
+            {% endif %}
+          {% endif %}
+          <a class="font-weight-bold ms-1" style="cursor: pointer; font-size: 20px;" href="/admin/users/{{ host_author.getId() }}/manage"><i class="fas fa-user fa-1,5x"> </i> {{ host_author.getUsername() }}</a>
+          <p class="font-weight-bol ms-1"><i class="fas fa-heart fa-1,5x" style="color: red;"> </i> {{ host.getLikes() }} {{ 'likes'|trans({}, 'base') }}</p>
+          <a href="javascript:void(0);" class="btn btn-primary" id="verification_button">{{ 'host.show_verification'|trans({}, 'host') }}</a>
+          <div class="verification" id="verification_link" style="display: none;">
+            {% if proofImg %}
+                {% for proof in proofImg %}
+                  <a href="{{ proof.link }}" target="__blank"> {{ proof.name }} </a>
+                {% endfor %}
+            {% elseif not proofImg or proofImg.length < 1 %}
+              <p> {{ 'nothing_to_show'|trans({}, 'base') }}
+            {% endif %}
+          </div>
+          <div class="boutons">
+            <a href="/hosts/{{ host.getId() }}" class="btn btn-primary">{{ 'show'|trans({}, 'base') }}</a>
+            {% if host.getIsVerified() %}
+              <a href="/admin/hosts/{{ host.getId() }}/unverify" class="btn btn-primary">{{ 'unverify'|trans({}, 'base') }}</a>
+            {% else %}
+              <a href="/admin/hosts/{{ host.getId() }}/verify" class="btn btn-primary">{{ 'verify'|trans({}, 'base') }}</a>    
+            {% endif %}
+            <a class="btn btn-primary" onclick="if(confirm('{{'are_you_sure'|trans({}, 'base')}}')){
+              document.location.href='/admin/hosts/{{ host.id }}/delete'
+            }"><i class="fas fa-trash"> </i> {{ 'delete'|trans({}, 'base') }}</a>
+            {% if host.getIsSuspend() %}
+              <a class="btn btn-primary" onclick="if(confirm('{{'are_you_sure'|trans({}, 'base')}}')){
+              document.location.href='/admin/hosts/{{ host.id }}/unsuspend'
+              }"> {{ 'unsuspend'|trans({}, 'base') }}</a>
+            {% else %}
+              <a class="btn btn-primary" onclick="if(confirm('{{'are_you_sure'|trans({}, 'base')}}')){
+              document.location.href='/admin/hosts/{{ host.id }}/suspend'
+            }"> {{ 'suspend'|trans({}, 'base') }}</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="card col-sm-5 mt-2 m-4">
+        <div class="card-header">
+          <h6> {{ 'edit_infos'|trans({}, 'base') }} </h6>
+          <span class="subtitle"> {{ 'all_infos_null_not_edit'|trans({}, 'base') }} </span>
+          <form method="POST" action="/admin/hosts/{{ host.getId() }}/edit" enctype="multipart/form-data">
+            <div class="row"> 
+              <div class="input-group is-focused input-group-outline my-3">
+                <label class="form-label">{{ 'host.name'|trans({}, 'host') }} *</label>
+                <input type="text" name="host_name" value="{{ host.name }}" maxlength="18" class="form-control focused">
+              </div>
+              <label class="form-label">{{ 'host.description'|trans({}, 'host') }} </label>
+              <textarea id="summernote-host_description" name="host_description" maxlength="400" onchance="console.log('test')"> {{ host.description }} </textarea>
+              <div class="input-group is-focused input-group-outline my-3">
+                <label class="form-label">{{ 'host.legal_number'|trans({}, 'host') }}</label>
+                <input type="text" name="host_legal_number" value="{{ host.getLegalNumber() }}" class="form-control" onclick="console.log(this.parentElement)">
+              </div>
+              <div class="input-group is-focused input-group-outline my-3">
+                <label class="form-label">{{ 'host.website'|trans({}, 'host') }}</label>
+                <input type="text" name="host_website" value="{{ host.getWebsite() }}" class="form-control" onclick="console.log(this.parentElement)">
+              </div>
+              <input type="file" id="logo" name="logo" style="display: none;">
+              <label for="logo" class="btn btn-primary">{{ 'select_image'|trans({}, 'base') }} {{ 'width_autorized'|trans({}, 'base') }}: 8Mo</label> 
+              <input type="hidden" name="token" value="{{ csrf_token('authenticate_admin') }}"/>
+              <input type="submit" class="btn btn-primary" placeholder="{{ 'send'|trans({}, 'base') }}" />
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div class="fixed-plugin">
+    <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
+      <i class="material-icons py-2">settings</i>
+    </a>
+    <div class="card shadow-lg">
+      <div class="card-header pb-0 pt-3">
+        <div class="float-start">
+          <h5 class="mt-3 mb-0">{{ 'dashboard_parameters'|trans({}, 'admin') }}</h5>
+          <p>{{ 'dashboard_parameters.description'|trans({}, 'admin') }}</p>
+        </div>
+        <div class="float-end mt-4">
+          <button class="btn btn-link text-dark p-0 fixed-plugin-close-button">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <!-- End Toggle Button -->
+      </div>
+      <hr class="horizontal dark my-1">
+      <div class="card-body pt-sm-3 pt-0">
+        <!-- Sidebar Backgrounds -->
+        <div class="mt-2 d-flex">
+          <h6 class="mb-0">{{ 'dashboard.parameters.light_dark'|trans({}, 'admin') }}</h6>
+          <div class="form-check form-switch ps-0 ms-auto my-auto">
+            <input class="form-check-input mt-1 ms-auto" type="checkbox" id="dark-version" onclick="darkMode(this)">
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+  $(document).ready(function() {
+    $('#summernote-host_description').summernote({enterHtml: '<p class="host_description"> </p>'});
+  });
+  
+  button = document.getElementById('verification_button')
+  button.onclick = function() {
+    link = document.getElementById('verification_link')
+    if(link.style.display === 'none'){
+      button.innerText = '{{ "host.dont_show_verification"|trans({}, "host") }}'
+      link.style.display = 'block'
+    }else {
+      button.innerText = '{{ "host.show_verification"|trans({}, "host") }}'
+      link.style.display = 'none'
+    }
+  }
+ </script>
+{% endblock %}

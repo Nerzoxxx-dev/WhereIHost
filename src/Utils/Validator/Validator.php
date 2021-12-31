@@ -55,4 +55,9 @@ class Validator {
         if(!filter_var($email, FILTER_VALIDATE_EMAIL)) $this->errors[] = $trans->trans("validator.invalid_email", [], 'validator');
         return $this;
     }
+
+    public function username(string $username, TranslatorInterface $trans){
+        if(!is_string($username) || strlen($username) < 3) $this->errors[] = $trans->trans('validator.invalid_username', [], 'validator');
+        return $this;
+    }
 }

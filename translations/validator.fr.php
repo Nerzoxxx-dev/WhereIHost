@@ -8,5 +8,6 @@ return [
     "validator.not.size.max" => "Le champ %field% doit faire au maximum %size% caractère(s).",
     "validator.not.phone_number" => "Le champ %field% doit être un numéro de téléphone. Ex: 0676767676",
     "validator.not.password" => "Le champ %field% est incorrect. Il doit contenir un caractère spécial (@, !...), au moins un chiffre et une lettre majuscule et minuscule, et doit comporter de 8 à 12 caractères.",
-    "validator.invalid_email" => "L'email fournie est invalide."
+    "validator.invalid_email" => "L'email fournie est invalide.",
+    "validator.invalid_username" => "Le nom d'utilisateur fourni est invalide."
 ];

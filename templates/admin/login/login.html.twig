@@ -1,0 +1,21 @@
+{% extends 'admin/login/base.html.twig' %}
+
+{% block body %}
+
+<div class="login">
+
+  <h1>{{ 'login'|trans({}, 'base') }}</h1>
+    <form method="post" action="/admin/login">
+      <input type="email" name="id" placeholder="{{ 'admin.id'|trans({}, 'admin') }}" required="required" />
+        <input type="password" name="password" placeholder="{{ 'password'|trans({}, 'base') }}" required="required" />
+        <button type="submit" class="btn btn-primary btn-block btn-large">{{ 'login'|trans({}, 'base') }}</button>
+    </form>
+</div>
+<script type="text/javascript" src="{{ asset('js/adminAlert.js') }}" />
+<script></script>
+{% if errors is defined and errors %}
+    <script> customAlert.alert("{{ errors }}") </script>
+   {% set errors = "" %}
+
+{% endif %}
+{% endblock %}

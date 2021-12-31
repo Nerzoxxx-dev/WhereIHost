@@ -28,6 +28,28 @@ class UserUtils {
         return true;
     }
 
+    public static function userExistsByUsername($username, ManagerRegistry $doctrine, TranslatorInterface $trans): bool {
+        $errors = (new Validator())->username($username, $trans)->validate();
+
+        if(!empty($errors)) return false;
+
+        $user = $doctrine->getRepository(User::class)->findOneBy(['username' => $username]);
+
+        if(!$user) return false;
+        return true;
+    }
+
+    public static function userExistsByPhoneNumber($phone_number, ManagerRegistry $doctrine, TranslatorInterface $trans): bool {
+        $errors = (new Validator())->phoneNumber($trans, $phone_number, 'phone_number')->validate();
+
+        if(!empty($errors)) return false;
+
+        $user = $doctrine->getRepository(User::class)->findOneBy(['phone_number' => $phone_number]);
+
+        if(!$user) return false;
+        return true;
+    }
+
     public static function getById($id, ManagerRegistry $doctrine) :?User {
         $user = $doctrine->getRepository(User::class)->find($id);
         return $user;
@@ -64,5 +86,12 @@ class UserUtils {
         if(!$user) return false;
         if($user->getVerifiedAt() === null) return false;
         return true;
+    }
+
+    public static function accountExists($request, ManagerRegistry $doctrine, TranslatorInterface $trans): bool {
+        if(self::userExistsByEmail($request->get('email'), $doctrine, $trans)) return true;
+        if(self::userExistsByUsername($request->get('username'), $doctrine, $trans)) return true;
+        if(self::userExistsByPhoneNumber($request->get('phone_number'), $doctrine, $trans)) return true;
+        return false;
     }
 }
